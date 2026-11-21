@@ -33,6 +33,11 @@ ADMIN_PASS=""
 if [ -z "$SERVER_IP" ] && [ -t 0 ]; then
   read -r -p "请输入服务器公网 IP（直接回车自动检测）: " SERVER_IP
 fi
+# 输入的不是有效 IPv4（比如粘贴命令时被 read 吃掉了整行）就清空，改走自动检测，别直接报错退出
+if [ -n "$SERVER_IP" ] && ! printf '%s' "$SERVER_IP" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
+  echo "提示：输入的不是有效 IPv4（$SERVER_IP），改用自动检测。"
+  SERVER_IP=""
+fi
 
 # ---------- 1. 检查 ----------
 [ "$(id -u)" -ne 0 ] && { echo "请用 root 运行这个脚本"; exit 1; }
